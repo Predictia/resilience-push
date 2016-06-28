@@ -6,7 +6,7 @@ from netCDF4 import num2date, date2num
 from datetime import datetime, timedelta
 
 data = []
-with open('/home/kktuax/Downloads/globalstats.csv') as csvfile:
+with open('globalstats.csv') as csvfile:
     reader = csv.DictReader(csvfile, delimiter='\t')
     for row in reader:
         data.append(row)
