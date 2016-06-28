@@ -66,7 +66,7 @@ ncvar = ncout.createVariable('windSpeed',np.float32,('time', 'latitude','longitu
 ncvar.grid_mapping = "projection"
 ncvar.unit = "ms-1"
 
-arr = np.full((len(rtimes), len(rlats), len(rlons)), 9999, dtype=int)
+arr = np.full((len(rtimes), len(rlats), len(rlons)), 9999, dtype=float)
 for cell_id,row in data.items():
     latIdx = (np.abs(rlats-float(row['lat']))).argmin()
     lonIdx = (np.abs(rlons-float(row['lon']))).argmin()

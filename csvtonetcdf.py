@@ -53,17 +53,24 @@ variables.append({'variableName': 'power', 'unit': 'KW', 'type': np.float32, 'fi
 
 for variable in variables:
     variable['ncvar'] = ncout.createVariable(variable['variableName'],variable['type'],('time', 'latitude','longitude'), fill_value=variable['fill_value'])
-    variable['ncvar'][:,:,:] = variable['fill_value']
     variable['ncvar'].grid_mapping = "projection"
     if variable['unit']:
         variable['ncvar'].unit = variable['unit']
+    if variable['type'] == np.int16:
+        variable['arr'] = np.full((1, len(rlats), len(rlons)), variable['fill_value'], dtype=int)
+    else:
+        variable['arr'] = np.full((1, len(rlats), len(rlons)), variable['fill_value'], dtype=float)
 for row in data:
     latIdx = (np.abs(rlats-float(row['lat']))).argmin()
     lonIdx = (np.abs(rlons-float(row['lon']))).argmin()
     timeIdx = 0
     for variable in variables:
         value = float(row[variable['variableName']])
-        if variable['type'] == np.int8:
+        if variable['type'] == np.int16:
             value = int(round(value))
-        variable['ncvar'][timeIdx, latIdx, lonIdx] = value
+        variable['arr'][timeIdx, latIdx, lonIdx] = value
+
+for variable in variables:
+    variable['ncvar'][:, :, :] = variable['arr']
+
 ncout.close()
