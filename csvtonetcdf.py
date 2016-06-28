@@ -3,7 +3,7 @@ import numpy as np
 from numpy import arange, dtype
 import netCDF4
 from netCDF4 import num2date, date2num
-import pandas as pd
+from datetime import datetime, timedelta
 
 data = []
 with open('/home/kktuax/Downloads/globalstats.csv') as csvfile:
@@ -17,9 +17,7 @@ rlats = np.array(sorted(set(map(lambda row : float(row['lat']), data))))
 rlats = np.linspace(min(rlats),max(rlats),num=len(rlats))
 
 ncout = netCDF4.Dataset('/tmp/out.nc','w')
-vtimes = (pd.Timestamp('2015-12-01'))
-#vlats = np.arange(-89.65,90,0.7)
-#vlons = np.arange(-179.3,180,0.7)
+vtimes = (datetime(2015,12,01))
 
 ncout.createDimension('longitude', len(rlons))
 ncout.createDimension('latitude', len(rlats))
@@ -47,15 +45,15 @@ projection.earth_radius = 6367470.0
 projection.proj4 = "+proj=longlat +a=6367470 +e=0 +no_defs"
 
 variables = []
-variables.append({'variableName': 'meanPrediction', 'unit': 'ms-1', 'type': np.float32})
-variables.append({'variableName': 'meanHistoric', 'unit': 'ms-1', 'type': np.float32})
-variables.append({'variableName': 'rpss', 'unit': None, 'type': np.float32})
-variables.append({'variableName': 'ocean', 'unit': None, 'type': np.int8})
-variables.append({'variableName': 'power', 'unit': 'KW', 'type': np.float32})
+variables.append({'variableName': 'meanPrediction', 'unit': 'ms-1', 'type': np.float32, 'fill_value' : 9999})
+variables.append({'variableName': 'meanHistoric', 'unit': 'ms-1', 'type': np.float32, 'fill_value' : 9999})
+variables.append({'variableName': 'rpss', 'unit': None, 'type': np.float32, 'fill_value' : 9999})
+variables.append({'variableName': 'ocean', 'unit': None, 'type': np.int16, 'fill_value' : 255})
+variables.append({'variableName': 'power', 'unit': 'KW', 'type': np.float32, 'fill_value' : 9999})
 
 for variable in variables:
-    variable['ncvar'] = ncout.createVariable(variable['variableName'],variable['type'],('latitude','longitude', 'time'), fill_value=9999)
-    variable['ncvar'][:,:,:] = 9999
+    variable['ncvar'] = ncout.createVariable(variable['variableName'],variable['type'],('time', 'latitude','longitude'), fill_value=variable['fill_value'])
+    variable['ncvar'][:,:,:] = variable['fill_value']
     variable['ncvar'].grid_mapping = "projection"
     if variable['unit']:
         variable['ncvar'].unit = variable['unit']
@@ -67,5 +65,5 @@ for row in data:
         value = float(row[variable['variableName']])
         if variable['type'] == np.int8:
             value = int(round(value))
-        variable['ncvar'][latIdx, lonIdx, timeIdx] = value
+        variable['ncvar'][timeIdx, latIdx, lonIdx] = value
 ncout.close()
