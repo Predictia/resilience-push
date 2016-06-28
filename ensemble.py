@@ -66,21 +66,21 @@ projection.grid_mapping_name = "latitude_longitude"
 projection.earth_radius = 6367470.0
 projection.proj4 = "+proj=longlat +a=6367470 +e=0 +no_defs"
 
-ncvar = ncout.createVariable('windSpeed',np.float32,('time', 'latitude', 'longitude', 'ensemble'), fill_value=9999)
+ncvar = ncout.createVariable('windSpeed',np.float32,('time', 'ensemble', 'latitude', 'longitude'), fill_value=9999)
 ncvar.grid_mapping = "projection"
 ncvar.unit = "ms-1"
 
 from random import randint
 
 
-arr = np.full((1, len(rlats), len(rlons), len(rmembers)), 9999, dtype=float)
+arr = np.full((1, len(rmembers), len(rlats), len(rlons)), 9999, dtype=float)
 for cell_id,row in data.items():
     latIdx = (np.abs(rlats-float(row['lat']))).argmin()
     lonIdx = (np.abs(rlons-float(row['lon']))).argmin()
     if 'forecasts' in row.keys():
         eIdx = 0
         for forecast in row['forecasts']:
-            arr[0, latIdx, lonIdx, eIdx] = forecast
+            arr[0, eIdx, latIdx, lonIdx] = forecast
             eIdx = eIdx + 1
 
 print "Defined data array ..."
