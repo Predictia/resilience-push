@@ -29,7 +29,7 @@ def write_ensemble_nc(out_location, global_file_location, json_file_location, vt
     ensemble = create_ensemble(ncout, rmembers)
     ncvar = ncout.createVariable('windSpeed',np.float32,('time', 'ensemble', 'latitude', 'longitude'), fill_value=9999)
     ncvar.grid_mapping = "projection"
-    ncvar.unit = "ms-1"
+    ncvar.units = "ms-1"
     arr = np.full((1, len(rmembers), len(rlats), len(rlons)), 9999, dtype=float)
     for cell_id,row in data.items():
         latIdx = (np.abs(rlats-float(row['lat']))).argmin()

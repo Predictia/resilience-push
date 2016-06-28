@@ -47,7 +47,7 @@ def write_observations_nc(out_location, global_file_location, json_file_location
     times = create_time(ncout, rtimes)
     ncvar = ncout.createVariable('windSpeed',np.float32,('time', 'latitude','longitude'), fill_value=9999)
     ncvar.grid_mapping = "projection"
-    ncvar.unit = "ms-1"
+    ncvar.units = "ms-1"
     arr = np.full((len(rtimes), len(rlats), len(rlons)), 9999, dtype=float)
     for cell_id,row in data.items():
         latIdx = (np.abs(rlats-float(row['lat']))).argmin()
@@ -59,5 +59,3 @@ def write_observations_nc(out_location, global_file_location, json_file_location
     print "Defined data array ..."
     ncvar[:,:,:] = arr
     ncout.close()
-
-write_observations_nc("/tmp/obs.nc", "globalstats.csv", "*.json")
