@@ -5,11 +5,12 @@ import numpy as np
 from numpy import arange, dtype
 import netCDF4
 from netCDF4 import num2date, date2num
-from datetime import datetime, timedelta
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 def read_data(global_file_location):
     data = []
-    with open('globalstats.csv') as csvfile:
+    with open(global_file_location) as csvfile:
         reader = csv.DictReader(csvfile, delimiter='\t')
         for row in reader:
             data.append(row)
@@ -23,7 +24,7 @@ def write_global_nc(out_location, global_file_location, vtime):
     rlats = np.linspace(min(rlats),max(rlats),num=len(rlats))
     vtimes = [vtime]
     min_time = min(vtimes)
-    max_time = max(vtimes) + timedelta(3*365/12)
+    max_time = max(vtimes) + relativedelta(months=3)
     ncout = create_nc(out_location, rlats, rlons, min_time, max_time)
     projection = create_projection(ncout)
     lats = ceate_latitude(ncout, rlats)

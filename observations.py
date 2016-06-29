@@ -11,12 +11,12 @@ import json
 
 def read_data(global_file_location, json_file_location):
     data = {}
-    with open('globalstats.csv') as csvfile:
+    with open(global_file_location) as csvfile:
         reader = csv.DictReader(csvfile, delimiter='\t')
         for row in reader:
             data[int(row['cellID'])] = row
     print "Readed CSV file ..."
-    for json_file in glob.glob("*.json"):
+    for json_file in glob.glob(json_file_location):
         with open(json_file) as data_file:
             json_data = json.load(data_file)
             row = data[json_data['id']]

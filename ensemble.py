@@ -5,7 +5,8 @@ import numpy as np
 from numpy import dtype
 import glob
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 def write_ensemble_nc(out_location, global_file_location, json_file_location, vtime):
     data = read_data(global_file_location, json_file_location)
@@ -15,12 +16,12 @@ def write_ensemble_nc(out_location, global_file_location, json_file_location, vt
     rlats = np.linspace(min(rlats),max(rlats),num=len(rlats))
     rmembers = []
     for cell_id,row in data.items():
-        if not rmembers and row['forecasts']:
+        if not rmembers and 'forecasts' in row.keys():
             rmembers = range(1, 1 + len(row['forecasts']))
             break
     vtimes = [vtime]
     min_time = min(vtimes)
-    max_time = max(vtimes) + timedelta(3*365/12)
+    max_time = max(vtimes) + relativedelta(months=3)
     ncout = create_nc(out_location, rlats, rlons, min_time, max_time)
     projection = create_projection(ncout)
     lats = ceate_latitude(ncout, rlats)
@@ -57,5 +58,3 @@ def read_data(global_file_location, json_file_location):
             row['forecasts'] = json_data['forecasts'][0]['values']
     print "Readed JSON files ..."
     return data
-
-write_ensemble_nc("/tmp/enb.nc", "globalstats.csv", "*.json", datetime(2015,12,01))
