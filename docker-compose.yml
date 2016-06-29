@@ -1,0 +1,5 @@
+resilience-push:
+  build:
+    .
+  volumes:
+  - .:/code
